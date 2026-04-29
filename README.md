@@ -23,15 +23,15 @@ Current:
 * Preview
 
 Planned:
-* File icons
-* Seeking in preview window
+* Preview file icons
 * Entering archive
 
 See the Ratarmount docs for [Supported
-Formats](https://github.com/mxmlnkn/ratarmount#supported-formats). Note that
-the full version is required for use with certain formats. See
-[Installation](https://github.com/mxmlnkn/ratarmount#installation) for more
-details.
+Formats](https://github.com/mxmlnkn/ratarmount#supported-formats).
+
+Note that the full version of Ratarmount is required for use with certain
+formats. See [Installation](https://github.com/mxmlnkn/ratarmount#installation)
+for more details.
 
 ## Requirements
 
@@ -73,9 +73,9 @@ The listed formats are not exhaustive.
 ## Credits
 
 * This Ratarmount issue [comment](https://github.com/mxmlnkn/ratarmount/issues/56#issuecomment-799983738)
-  about creating the VFS.
+  about creating the VFS
 * This [ranger](https://ranger.fm/) issue [comment](https://github.com/ranger/ranger/issues/456#issuecomment-798318187)
-  about integrating AVFS for traversing archives.
+  about integrating AVFS for traversing archives
 * [Yazi preset archive plugin](https://github.com/sxyazi/yazi/blob/shipped/yazi-plugin/preset/plugins/archive.lua)
 * [Yazi preset folder plugin](https://github.com/sxyazi/yazi/blob/shipped/yazi-plugin/preset/plugins/folder.lua)
 * [ouch.yazi](https://github.com/ndtoan96/ouch.yazi)
@@ -84,7 +84,7 @@ The listed formats are not exhaustive.
 
 This project uses the following tools and plugins:
 
-* [LuaLS](https://luals.github.io/): See [config](/.luarc.json)
+* [LuaLS](https://luals.github.io/): Lua language server
 * [types.yazi](https://github.com/yazi-rs/plugins/tree/main/types.yazi): To
   provide Lua annotations for Yazi types
 * [StyLua](https://github.com/JohnnyMorganz/StyLua): For Lua code formatting

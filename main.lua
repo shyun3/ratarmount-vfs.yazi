@@ -8,6 +8,14 @@
 ---@field skip number Number of units to skip. The units depend on your
 ---  previewer, such as lines for code and percentages for videos.
 
+---@class SeekJob
+---
+--- Derived from https://yazi-rs.github.io/docs/plugins/overview/#previewer
+---
+---@field file File `File` being scrolled.
+---@field area ui.Rect `Rect` of the available preview area.
+---@field units number Number of units to scroll.
+
 local M = {}
 
 ---@param text string
@@ -98,8 +106,7 @@ function M:peek(job)
   end
 end
 
-function M:seek(job)
-  -- ...
-end
+---@param job SeekJob
+function M:seek(job) require("code"):seek(job) end
 
 return M
