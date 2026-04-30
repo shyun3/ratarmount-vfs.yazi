@@ -18,6 +18,25 @@
 
 local M = {}
 
+--- `entry` helper for gathering selected files
+---
+---@return Url[]
+local get_entry_vfs_targets = ya.sync(function()
+  local urls = {}
+
+  local tab = cx.active
+  if #tab.selected == 0 then
+    local hovered = tab.current.hovered
+    if hovered then table.insert(urls, hovered.url) end
+  else
+    for _, url in pairs(tab.selected) do
+      table.insert(urls, url)
+    end
+  end
+
+  return urls
+end)
+
 ---@param text string
 ---@param area ui.Rect
 ---
@@ -26,19 +45,41 @@ local function error_widget(text, area)
   return ui.Text(text):wrap(ui.Wrap.YES):area(area) ---@type ui.Text
 end
 
----@param job PeekJob
-function M:peek(job)
-  local uid = ya.uid()
-  local vfs = Url("/run/user"):join(tostring(uid)):join("ratarmount")
-
+--- Prepends the default Ratarmount VFS directory to the given location
+---
+---@param url Url Must be an absolute path
+---
+---@return Url Corresponding location under the Ratarmount VFS
+local function prepend_vfs_dir(url)
   ---@diagnostic disable-next-line: undefined-field
-  assert(job.file.url.is_absolute) -- Field is missing from types.yazi
+  assert(url.is_absolute) -- Field is missing from types.yazi
+
+  local uid = tostring(ya.uid())
+  local vfs = Url("/run/user"):join(uid):join("ratarmount")
 
   -- Make sure not to join an absolute path or the left hand side will be
   -- replaced
-  local path_suffix = job.file.url:strip_prefix("/")
-  local dir = vfs:join(tostring(path_suffix))
-  assert(dir:starts_with(vfs))
+  local path_suffix = url:strip_prefix("/")
+  local result = vfs:join(tostring(path_suffix))
+  assert(result:starts_with(vfs))
+
+  return result
+end
+
+--- Enters the Ratarmount VFS locations corresponding to the given files
+---
+---@param urls (string | Url)[] Strings must be in URL format
+local function goto_vfs(urls)
+  for _, url in pairs(urls) do
+    ya.emit("tab_create", { prepend_vfs_dir(Url(url)) })
+  end
+end
+
+function M:setup() ps.sub_remote("ratarmount-vfs", goto_vfs) end
+
+---@param job PeekJob
+function M:peek(job)
+  local dir = prepend_vfs_dir(job.file.url)
 
   ya.preview_widget(
     job,
@@ -108,5 +149,7 @@ end
 
 ---@param job SeekJob
 function M:seek(job) require("code"):seek(job) end
+
+function M:entry() goto_vfs(get_entry_vfs_targets()) end
 
 return M

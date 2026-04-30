@@ -20,11 +20,11 @@ Ratarmount was chosen over alternatives like
 ## Features
 
 Current:
-* Preview
+* Preview archive
+* Traverse archive
 
 Planned:
 * Preview file icons
-* Entering archive
 
 See the Ratarmount docs for [Supported
 Formats](https://github.com/mxmlnkn/ratarmount#supported-formats).
@@ -59,16 +59,49 @@ despite being supported. See this
 
 ## Usage
 
+See [Configuration](https://yazi-rs.github.io/docs/configuration/overview) for
+the config files mentioned below.
+
 ### Preview
 
-To preview archives, add the following to your `yazi.toml` (see
-[Configuration](https://yazi-rs.github.io/docs/configuration/overview)):
+To preview archives, add the following to your `yazi.toml`:
 ```toml
 [[plugin.prepend_previewers]]
 mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip2,lzma}"
 run = "ratarmount-vfs"
 ```
 The listed formats are not exhaustive.
+
+### Traversal
+
+To traverse archives, begin by setting up the plugin in your `init.lua` (see
+[Plugins](https://yazi-rs.github.io/docs/plugins/overview)):
+```lua
+require("ratarmount-vfs"):setup()
+```
+
+Then, configure the opener in `yazi.toml`:
+```toml
+[opener]
+extract = [
+  { run = 'ya pub ratarmount-vfs --list %S', desc = "Enter Ratarmount VFS" },
+]
+```
+Now, opening an archive will create a new tab in its corresponding Ratarmount
+VFS directory. The directory can be explored like any other. Multiple tabs may
+be opened by selecting multiple archives.
+
+Note that this will override the default open action for archives, which is to
+extract them.
+
+If desired, a separate key can be configured for archive traversal by
+configuring your `keymap.toml`:
+```toml
+[[mgr.prepend_keymap]]
+on = ["T"]
+run = "plugin ratarmount-vfs"
+desc = "Enter Ratarmount VFS"
+```
 
 ## Credits
 
@@ -86,7 +119,7 @@ This project uses the following tools and plugins:
 
 * [LuaLS](https://luals.github.io/): Lua language server
 * [types.yazi](https://github.com/yazi-rs/plugins/tree/main/types.yazi): To
-  provide Lua annotations for Yazi types
+  provide LuaCATS annotations for Yazi types
 * [StyLua](https://github.com/JohnnyMorganz/StyLua): For Lua code formatting
 
 
