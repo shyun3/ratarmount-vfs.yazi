@@ -44,7 +44,7 @@ for more details.
 
 Using the [Yazi package manager](https://yazi-rs.github.io/docs/cli#pm):
 ```sh
-ya pkg add shyun3/ratarmount-vfs.yazi
+ya pkg add shyun3/ratarmount-vfs
 ```
 
 Currently, this plugin assumes the Ratarmount-based VFS is available at
