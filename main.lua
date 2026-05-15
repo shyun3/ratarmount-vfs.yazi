@@ -37,14 +37,6 @@ local get_entry_vfs_targets = ya.sync(function()
   return urls
 end)
 
----@param text string
----@param area ui.Rect
----
----@return Renderable
-local function error_widget(text, area)
-  return ui.Text(text):wrap(ui.Wrap.YES):area(area) ---@type ui.Text
-end
-
 --- Prepends the default Ratarmount VFS directory to the given location
 ---
 ---@param url Url Must be an absolute path
@@ -75,6 +67,52 @@ local function goto_vfs(urls)
   end
 end
 
+---@param text string
+---@param area ui.Rect
+---
+---@return Renderable
+local function error_widget(text, area)
+  return ui.Text(text):wrap(ui.Wrap.YES):area(area) ---@type ui.Text
+end
+
+---@param line string Line output from `tree`. Assumes the `-p` flag was used
+---  and the trailing newline was stripped.
+---
+---@return string prefix Tree branch
+---@return string? filename
+---@return string filetype See `ls` permissions output
+local function split_tree_line(line)
+  local pre_start, pre_end = line:find("^[^[]-─ ")
+  local prefix = pre_start and line:sub(pre_start, pre_end) or ""
+
+  local _, _, filetype, filename =
+    line:find("^(%b[])  (.*)$", pre_end and pre_end + 1 or 1)
+  return prefix, filename, filetype and filetype:sub(2, 2) or ""
+end
+
+---@param line string Line output from `tree`
+---
+---@return ui.Line | string
+local function parse_tree_line(line)
+  local prefix, filename, type = split_tree_line(line)
+  if not filename then return line end
+
+  local icon = File({
+    url = Url(filename),
+    cha = Cha({
+      mode = tonumber(type == "d" and "40700" or "100644", 8),
+    }),
+  }):icon()
+
+  return icon
+      and ui.Line({
+        prefix,
+        ui.Span(icon.text .. " "):style(icon.style),
+        filename,
+      })
+    or line
+end
+
 function M:setup() ps.sub_remote("ratarmount-vfs", goto_vfs) end
 
 ---@param job PeekJob
@@ -98,9 +136,8 @@ function M:peek(job)
     return ya.preview_widget(job, error_widget(msg, job.area))
   end
 
-  local raw_dir = tostring(dir)
   local child, err = Command("tree")
-    :arg({ "--noreport", raw_dir })
+    :arg({ "--noreport", "-p", tostring(dir) })
     :stdout(Command.PIPED)
     :stderr(Command.PIPED)
     :spawn()
@@ -119,14 +156,21 @@ function M:peek(job)
     if event == 1 then
       local msg = ("ratarmount-vfs:%s: %s"):format(dir, line)
       ya.err(msg)
+    else
+      line = line:gsub("\n$", "")
+
+      -- Normally, the first line output from `tree` is the target folder.
+      -- Replace this with the archive name to make it more readable.
+      if line:sub(1, 1) == "[" then
+        line = ("[%s]  %s"):format(job.file.cha.perm, job.file.name)
+      end
     end
 
-    -- Normally, the first line output from `tree` is the target folder.
-    -- Replace this with the archive name to make it more readable.
-    if line:gsub("\n$", "") == raw_dir then line = job.file.name end
-
     if skips >= job.skip then
-      table.insert(lines, ui.Line({ " ", line })) -- One space padding
+      table.insert(
+        lines,
+        ui.Line({ " ", parse_tree_line(line) }) -- One space padding
+      )
     else
       skips = skips + 1
     end

@@ -19,12 +19,9 @@ Ratarmount was chosen over alternatives like
 
 ## Features
 
-Current:
 * Preview archive
-* Traverse archive
-
-Planned:
 * Preview file icons
+* Traverse archive
 
 See the Ratarmount docs for [Supported
 Formats](https://github.com/mxmlnkn/ratarmount#supported-formats).
@@ -121,7 +118,6 @@ This project uses the following tools and plugins:
 * [types.yazi](https://github.com/yazi-rs/plugins/tree/main/types.yazi): To
   provide LuaCATS annotations for Yazi types
 * [StyLua](https://github.com/JohnnyMorganz/StyLua): For Lua code formatting
-
 
 [Yazi]: https://yazi-rs.github.io/
 [ratarmount]: https://github.com/mxmlnkn/ratarmount
