@@ -118,6 +118,7 @@ This project uses the following tools and plugins:
 * [types.yazi](https://github.com/yazi-rs/plugins/tree/main/types.yazi): To
   provide LuaCATS annotations for Yazi types
 * [StyLua](https://github.com/JohnnyMorganz/StyLua): For Lua code formatting
+* [rumdl](https://rumdl.dev/): For Markdown file formatting
 
 [Yazi]: https://yazi-rs.github.io/
 [ratarmount]: https://github.com/mxmlnkn/ratarmount
